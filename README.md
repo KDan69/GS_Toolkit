@@ -12,6 +12,9 @@ Původní skript (TeamNS Toolkit) sloužil k usnadnění vkládání loga a styl
 - Vkládat skryté zprávy do výše uvedeného loga
 - Znepříjemnit den sledovačům pochybných online streamů
   - Možná ale později bude opět umět, momentálně je rozpracovaná velice účinná varianta, nicméně kvůli nedostatku času jsem se soustředil na jiné věci
-- Způsobovat chyby při spuštění pod Windows XP ^_^
+- Způsobovat chyby při spouštění pod Windows XP ^_^
 
 ## Instalace
+Skript stačí umístit do složky `automation\autoload`, která je ve složce s Aegisubem (např. `C:\Program Files\Aegisub`).
+
+Pro využití porovnávací funkce, resp. importu titulků z videa, je potřeba nainstalovat [MKVToolNix](https://www.fosshub.com/MKVToolNix.html), Aegisub to sice sám od sebe umí, ale tato funkce se bohužel nedá spustit pomocí skriptu.
