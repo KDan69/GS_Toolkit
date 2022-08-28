@@ -3,7 +3,15 @@ Sada nástrojů pro Aegisub
 ### O skriptu
 Původní skript (TeamNS Toolkit) sloužil k usnadnění vkládání loga a stylů nebo např. ke znepříjemnění dne sledovačů pochybných online streamů. Byl dostupný pouze členům skupiny a pár výjimkám, ale jeho upravenou a aktuální verzi nyní najdete zde.
 ### Co to teď vůbec umí?
-- Hmm
-  - fff
+- Generovat výpisy změn pro usnadnění korektury
+- Načíst druhé titulky a porovnávat mezi nimi a momentálně upravovanými
+- Rychleji upravovat údaje ve vlastnostech souboru 
+
+### Co už neumí?
+- Vkládat TeamNS logo
+- Vkládat skryté zprávy do výše uvedeného loga
+- Znepříjemnit den sledovačům pochybných online streamů
+  - Možná ale později bude opět umět, momentálně je rozpracovaná velice účinná varianta, nicméně kvůli nedostatku času jsem se soustředil na jiné věci
+- Způsobovat chyby při spuštění pod Windows XP ^_^
 
 Něco
