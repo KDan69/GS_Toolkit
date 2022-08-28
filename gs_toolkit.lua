@@ -389,7 +389,7 @@ function korektorLog(subs, sel, act)
 		if res_korektor["komentar"] ~= "" then
 			radekKom = "\n    (" .. res_korektor["komentar"] .. ")" 
 		end
-		log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".log", "a+")
+		log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "a+")
 		io.output(log_soubor)
 		io.write(radekInfo..") "..res_korektor["puvodni"].. " -> "..res_korektor["upraveny"]..radekKom.."\n")
 		io.close(log_soubor)
@@ -400,13 +400,13 @@ function korektorLog(subs, sel, act)
 			aegisub.debug.out("Já to za tebe komentovat nebudu.\nZkus to znovu...\n")
 		else
 			radekKom = "\n    (" .. res_korektor["komentar"] .. ")" 
-			log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".log", "a+")
+			log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "a+")
 			io.output(log_soubor)
 			io.write(radekInfo..") "..res_korektor["puvodni"]..radekKom.."\n")
 			io.close(log_soubor)
 		end
 	elseif but_korektor == "Smazat posledni radek" then
-		log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".log", "r")
+		log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "r")
 		io.input(log_soubor)
 		local radekCount = 0
 		logTemp={}
@@ -415,7 +415,7 @@ function korektorLog(subs, sel, act)
 			radekCount = radekCount + 1
 		end
 		io.close(log_soubor)
-		log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".log", "w")
+		log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "w")
 		--for index, hod in ipairs(logTemp) do
 		--	log_soubor:write(hod..'\n')
 		--end
@@ -434,7 +434,7 @@ end
 
 function korektorLogOpen()
 	local datum = os.date("*t")
-	os.execute(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".log")
+	os.execute(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt")
 end
 
 function mkvextract()	
@@ -589,7 +589,7 @@ function selfTest()
 	local datum = os.date("*t")
 	local file,err = io.open(gs_folder_path .. "\\test.hmm",'w')
     local file2,err2 = io.open(gs_folder_path .. "\\GS_Toolkit.cfg",'r') 
-    local file3,err3 = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".log",'r')
+    local file3,err3 = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt",'r')
     
 	if file then
         io.output(file)
@@ -643,7 +643,7 @@ function selfTest()
 		os.execute(gs_folder_path .. "\\GS_Toolkit.cfg")
 		selfTest()
 	elseif testButtons == "Otevrit vypis Korektura" then
-		os.execute(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".log")
+		os.execute(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt")
 		selfTest()
 	elseif testButtons == "Otevrit pracovni slozku" then
 		os.execute('explorer "' .. gs_folder_path .. '"')
