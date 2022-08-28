@@ -18,3 +18,6 @@ Původní skript (TeamNS Toolkit) sloužil k usnadnění vkládání loga a styl
 Skript stačí umístit do složky `automation\autoload`, která je ve složce s Aegisubem (např. `C:\Program Files\Aegisub`).
 
 Pro využití porovnávací funkce, resp. importu titulků z videa, je potřeba nainstalovat [MKVToolNix](https://www.fosshub.com/MKVToolNix.html), Aegisub to sice sám od sebe umí, ale tato funkce se bohužel nedá spustit pomocí skriptu.
+
+## Dokončení
+Po spuštění Aegisubu by nyní měl v kartě Automation přibýt GS Toolkit. Probliknutí příkazovéno řádku při spouštění je normální, slouží k přidělení práv k zápisu do pracovní složky (`Dokumenty\GS Toolkit`)
