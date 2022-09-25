@@ -7,22 +7,38 @@
 script_name = "GS Toolkit"
 script_description = "Užitečná sada nástrojů pro líné překladatele a korektory ^_^"
 script_author = "KDan"
-script_version = "1.0"
+script_version = "1.1"
 
 include("karaskel.lua")
 
-gs_folder_path = os.getenv("userprofile").."\\Documents\\GS Toolkit"
+sep = package.config:sub(1,1)
+
+if os.getenv("userprofile") == nil then
+	home_slozka = os.getenv("HOME")
+	widle = false
+	gs_folder_path = home_slozka .. sep .. ".gstoolkit"
+	local test = io.open(gs_folder_path..sep.."GS_Toolkit.cfg")
+	if test == nil then
+		os.execute("mkdir " .. gs_folder_path)
+	else
+		io.close(test)
+	end
+else 	
+	home_slozka = os.getenv("userprofile") .. "\\Documents"
+	widle = true
+	os.execute('icacls '.. os.getenv("userprofile") .. "\\Documents") --získání práv k zápisu do složky pro gay operační systémy, háže chybu, ale funguje, takže w/e
+	gs_folder_path = home_slozka .. sep .. "GS Toolkit"
+end
+
 mkvtoolnix_path = "C:\\Program Files\\MKVToolNix"
 
-os.execute('icacls '.. os.getenv("userprofile") .. "\\Documents") --získání práv k zápisu do složky pro gay operační systémy, háže chybu, ale funguje, takže w/e
-
 function smazatConfig()
-	os.remove(gs_folder_path .. "\\GS_Toolkit.cfg")
+	os.remove(gs_folder_path .. sep .. "GS_Toolkit.cfg")
 end
 
 function smazatKor()
 	local datum = os.date("*t")
-	local log_path = gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt"
+	local log_path = gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt"
 	local soubor = io.open(log_path)
 	if soubor == nil then
 		aegisub.debug.out("Jo, to by ale ještě musel existovat...")
@@ -45,7 +61,7 @@ function smazatKor()
 end
 
 function zapsatConfig() 
-	config_soubor = io.open(gs_folder_path .. "\\GS_Toolkit.cfg", "w")
+	config_soubor = io.open(gs_folder_path .. sep .. "GS_Toolkit.cfg", "w")
 	io.output(config_soubor)
 	io.write("--Konfigurační soubor GS toolkitu--", "\n")
 	io.write("[mkvtoolnix]", "\n")
@@ -70,10 +86,10 @@ dialogNastaveni_buttons={"Ulozit"}
 dialogPorovnani_buttons={"Predchozi", "Dalsi", "Posun-", "Posun+", "Vychozi"}
 
 function cistConfig()
-	config_soubor = io.open(gs_folder_path .. "\\GS_Toolkit.cfg", "r")
+	config_soubor = io.open(gs_folder_path .. sep .. "GS_Toolkit.cfg", "r")
 	if config_soubor == nil then --vytvoří novej config soubor, pokud neexistuje
 		os.execute('md "' .. gs_folder_path .. '"')
-		config_soubor = io.open(gs_folder_path .. "\\GS_Toolkit.cfg", "w")
+		config_soubor = io.open(gs_folder_path .. sep .. "GS_Toolkit.cfg", "w")
 		io.output(config_soubor)
 		io.write("--Konfigurační soubor GS toolkitu--", "\n")
 		io.write("[mkvtoolnix]", "\n")
@@ -85,7 +101,7 @@ function cistConfig()
 		io.write("casovac=", "\n")
 		io.write("release=")
 		io.close(config_soubor)
-		config_soubor = io.open(gs_folder_path .. "\\GS_Toolkit.cfg", "r")
+		config_soubor = io.open(gs_folder_path .. sep .. "GS_Toolkit.cfg", "r")
 	end
 	io.input(config_soubor) --přečte hodnoty z configu 
 	configInfo=io.read("*line")
@@ -389,7 +405,7 @@ function korektorLog(subs, sel, act)
 		if res_korektor["komentar"] ~= "" then
 			radekKom = "\n    (" .. res_korektor["komentar"] .. ")" 
 		end
-		log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "a+")
+		log_soubor = io.open(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "a+")
 		io.output(log_soubor)
 		io.write(radekInfo..") "..res_korektor["puvodni"].. " -> "..res_korektor["upraveny"]..radekKom.."\n")
 		io.close(log_soubor)
@@ -400,13 +416,13 @@ function korektorLog(subs, sel, act)
 			aegisub.debug.out("Já to za tebe komentovat nebudu.\nZkus to znovu...\n")
 		else
 			radekKom = "\n    (" .. res_korektor["komentar"] .. ")" 
-			log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "a+")
+			log_soubor = io.open(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "a+")
 			io.output(log_soubor)
 			io.write(radekInfo..") "..res_korektor["puvodni"]..radekKom.."\n")
 			io.close(log_soubor)
 		end
 	elseif but_korektor == "Smazat posledni radek" then
-		log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "r")
+		log_soubor = io.open(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "r")
 		io.input(log_soubor)
 		local radekCount = 0
 		logTemp={}
@@ -415,7 +431,7 @@ function korektorLog(subs, sel, act)
 			radekCount = radekCount + 1
 		end
 		io.close(log_soubor)
-		log_soubor = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "w")
+		log_soubor = io.open(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "w")
 		--for index, hod in ipairs(logTemp) do
 		--	log_soubor:write(hod..'\n')
 		--end
@@ -434,7 +450,7 @@ end
 
 function korektorLogOpen()
 	local datum = os.date("*t")
-	os.execute(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt")
+	os.execute(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt")
 end
 
 function mkvextract()	
@@ -460,7 +476,7 @@ function mkvextract()
 			aegisub.progress.title("Extrahování titulků...")
 			os.execute(gs_folder_path .. "\\extract.bat")
 			aegisub.debug.out("Dokončeno... Možná i úspěšně...")
-			local engsubs_ass = io.open(gs_folder_path .. "\\eng_subs.ass", "r")
+			local engsubs_ass = io.open(gs_folder_path .. sep .. "eng_subs.ass", "r")
 			aegisub.progress.title("Otevírám titulky...")
 
 			
@@ -587,15 +603,15 @@ function selfTest()
 	local conf = ""
 	local kor = ""
 	local datum = os.date("*t")
-	local file,err = io.open(gs_folder_path .. "\\test.hmm",'w')
-    local file2,err2 = io.open(gs_folder_path .. "\\GS_Toolkit.cfg",'r') 
-    local file3,err3 = io.open(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt",'r')
+	local file,err = io.open(gs_folder_path .. sep.."test.hmm",'w')
+    local file2,err2 = io.open(gs_folder_path .. sep.."GS_Toolkit.cfg",'r') 
+    local file3,err3 = io.open(gs_folder_path .. sep.."Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt",'r')
     
 	if file then
         io.output(file)
 		io.write("Test")
 		io.close(file)
-		local temp = io.open(gs_folder_path .. "\\test.hmm",'r')
+		local temp = io.open(gs_folder_path .. sep.."test.hmm",'r')
 		io.input(temp)
 		local rdTest = io.read("*line")
 		if rdTest == "Test" then
@@ -640,10 +656,10 @@ function selfTest()
 	}
 	local testButtons, testResults = aegisub.dialog.display(dialogSelfTest_config, {"OK", "Otevrit vypis zmen", "Otevrit konfiguracni soubor", "Otevrit pracovni slozku"})
 	if testButtons == "Otevrit konfiguracni soubor" then
-		os.execute(gs_folder_path .. "\\GS_Toolkit.cfg")
+		os.execute(gs_folder_path .. sep .."GS_Toolkit.cfg")
 		selfTest()
 	elseif testButtons == "Otevrit vypis Korektura" then
-		os.execute(gs_folder_path .. "\\Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt")
+		os.execute(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt")
 		selfTest()
 	elseif testButtons == "Otevrit pracovni slozku" then
 		os.execute('explorer "' .. gs_folder_path .. '"')
@@ -655,10 +671,14 @@ function gsfolderOpen()
 	os.execute('explorer "' .. gs_folder_path .. '"')
 end
 
+function mamWidle()
+	return widle
+end
+
 aegisub.register_macro("GS Toolkit/Korektura/Zápis změny", "Zapíše úpravu řádku do výpisu", korektorLog)
 aegisub.register_macro("GS Toolkit/Korektura/Otevřít výpis změn", "Otevře výpis změn", korektorLogOpen)
 aegisub.register_macro("GS Toolkit/Korektura/Smazat dnešní výpis změn", "Odstraní dnešní výpis změn", smazatKor)
-aegisub.register_macro("GS Toolkit/Korektura/Načíst titulky z videa", "Extrahuje titulky z videa a načte je do porovnávače", mkvextract)
+aegisub.register_macro("GS Toolkit/Korektura/Načíst titulky z videa", "Extrahuje titulky z videa a načte je do porovnávače", mkvextract, mamWidle)
 aegisub.register_macro("GS Toolkit/Korektura/Načíst vlastní titulky", "Načte titulky do porovnávače", subsLoad)
 aegisub.register_macro("GS Toolkit/Korektura/Porovnávač titulků", "Otevře porovnávač titulků", porovnani)
 aegisub.register_macro("GS Toolkit/Podepsat titulky", "Otevře okno podpisu titulků", vlozitInfo)
