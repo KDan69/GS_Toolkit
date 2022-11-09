@@ -450,12 +450,12 @@ end
 
 function korektorLogOpen()
 	local datum = os.date("*t")
-	os.execute(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt")
+	os.execute('"'..gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. '.txt"')
 end
 
 function mkvextract()	
 	local video = aegisub.project_properties().video_file
-	local command = tostring('"' .. mkvtoolnix_path .. '\\mkvextract.exe" "' .. video .. '" tracks 2:' .. gs_folder_path .. '\\eng_subs.ass')
+	local command = tostring('"' .. mkvtoolnix_path .. '\\mkvextract.exe" "' .. video .. '" tracks 2:"' .. gs_folder_path .. '\\eng_subs.ass"')
 	engsubs_pole = {}
 	os.remove(gs_folder_path .. "\\extract.bat")
 	local toolnix = io.open(mkvtoolnix_path .. "\\mkvextract.exe")
@@ -466,7 +466,7 @@ function mkvextract()
 		if video == "" then
 			aegisub.debug.out("Nejdřív načti video.")
 		else
-			local bat = io.open(gs_folder_path .. "\\extract.bat", "a+")
+			local bat = io.open(gs_folder_path .. '\\extract.bat', "a+")
 			io.output(bat)
 			io.write("echo off\n")
 			io.write("cls\n")
@@ -474,7 +474,7 @@ function mkvextract()
 			io.close(bat)
 			aegisub.debug.out("Spouštím mkvextract...\n")
 			aegisub.progress.title("Extrahování titulků...")
-			os.execute(gs_folder_path .. "\\extract.bat")
+			os.execute('"' .. gs_folder_path .. '\\extract.bat"')
 			aegisub.debug.out("Dokončeno... Možná i úspěšně...")
 			local engsubs_ass = io.open(gs_folder_path .. sep .. "eng_subs.ass", "r")
 			aegisub.progress.title("Otevírám titulky...")
@@ -656,10 +656,10 @@ function selfTest()
 	}
 	local testButtons, testResults = aegisub.dialog.display(dialogSelfTest_config, {"OK", "Otevrit vypis zmen", "Otevrit konfiguracni soubor", "Otevrit pracovni slozku"})
 	if testButtons == "Otevrit konfiguracni soubor" then
-		os.execute(gs_folder_path .. sep .."GS_Toolkit.cfg")
+		os.execute('"' .. gs_folder_path .. sep ..'GS_Toolkit.cfg"')
 		selfTest()
-	elseif testButtons == "Otevrit vypis Korektura" then
-		os.execute(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt")
+	elseif testButtons == "Otevrit vypis zmen" then
+		os.execute('"' .. gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. '.txt"')
 		selfTest()
 	elseif testButtons == "Otevrit pracovni slozku" then
 		os.execute('explorer "' .. gs_folder_path .. '"')
