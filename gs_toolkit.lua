@@ -393,32 +393,54 @@ function korektorLog(subs, sel, act)
 			x=0,y=16,width=1,height=1,
 			label="Zvýraznit ve výpisu",
 			value=false
+		},
+		{
+			class="checkbox",name="mazatTagy",
+			x=1,y=16,width=1,height=1,
+			label="Nezapisovat s tagy",
+			value=true
 		}
 	}
 	but_korektor, res_korektor = aegisub.dialog.display(dialogKorektorLog_config, dialogKorektura_buttons)
 	local radekKom = ""
+	local upRadek
+	local puvRadek
 	local radekInfo = tostring(radekAct)
 	if res_korektor["zvyraznit"] then
 		radekInfo = "**"..tostring(radekAct)
 	end
 	if but_korektor == "Okorektit" then
+		if res_korektor["mazatTagy"] then
+			upRadek = res_korektor["upraveny"]:gsub("{[^}]+}", "")
+			puvRadek = res_korektor["puvodni"]:gsub("{[^}]+}", "")
+		else
+			upRadek = res_korektor["upraveny"]
+			puvRadek = res_korektor["puvodni"]
+		end
 		if res_korektor["komentar"] ~= "" then
 			radekKom = "\n    (" .. res_korektor["komentar"] .. ")" 
 		end
 		log_soubor = io.open(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "a+")
 		io.output(log_soubor)
-		io.write(radekInfo..") "..res_korektor["puvodni"].. " -> "..res_korektor["upraveny"]..radekKom.."\n")
+		io.write(radekInfo..") "..puvRadek.. " -> "..upRadek..radekKom.."\n")
 		io.close(log_soubor)
 		radekKor.text = tostring(res_korektor["upraveny"])
 		subs[act] = radekKor
 	elseif but_korektor == "Pouze okomentovat" then
+		if res_korektor["mazatTagy"] then
+			upRadek = res_korektor["upraveny"]:gsub("{[^}]+}", "")
+			puvRadek = res_korektor["puvodni"]:gsub("{[^}]+}", "")
+		else
+			upRadek = res_korektor["upraveny"]
+			puvRadek = res_korektor["puvodni"]
+		end
 		if res_korektor["komentar"] == "" then
 			aegisub.debug.out("Já to za tebe komentovat nebudu.\nZkus to znovu...\n")
 		else
 			radekKom = "\n    (" .. res_korektor["komentar"] .. ")" 
 			log_soubor = io.open(gs_folder_path .. sep .. "Korektura_" .. datum["day"] .. "." .. datum["month"] .. "." .. datum["year"] .. ".txt", "a+")
 			io.output(log_soubor)
-			io.write(radekInfo..") "..res_korektor["puvodni"]..radekKom.."\n")
+			io.write(radekInfo..") "..puvRadek..radekKom.."\n")
 			io.close(log_soubor)
 		end
 	elseif but_korektor == "Smazat posledni radek" then
@@ -675,6 +697,11 @@ function mamWidle()
 	return widle
 end
 
+function test()
+	local prdel = "{\\fs32 \\fad(200,200)} kokot, +ě2š2, degen \\n"
+	aegisub.debug.out("Origo: \n" .. prdel .. "\nEdit:\n" .. prdel:gsub("{[^}]+}", ""))
+end
+
 aegisub.register_macro("GS Toolkit/Korektura/Zápis změny", "Zapíše úpravu řádku do výpisu", korektorLog)
 aegisub.register_macro("GS Toolkit/Korektura/Otevřít výpis změn", "Otevře výpis změn", korektorLogOpen)
 aegisub.register_macro("GS Toolkit/Korektura/Smazat dnešní výpis změn", "Odstraní dnešní výpis změn", smazatKor)
@@ -686,3 +713,4 @@ aegisub.register_macro("GS Toolkit/Nastavení", "Otevře okno nastavení", toolk
 aegisub.register_macro("GS Toolkit/Otevřít pracovní složku", "Otevře pracovní složku", gsfolderOpen)
 aegisub.register_macro("GS Toolkit/Je všechno OK?", "Zkontroluje přítomnost souborů", selfTest)
 aegisub.register_macro("GS Toolkit/Smazat konfigurační soubor", "Odstraní konfigurační soubor", smazatConfig)
+aegisub.register_macro("test", "test", test)
