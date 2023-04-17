@@ -697,11 +697,6 @@ function mamWidle()
 	return widle
 end
 
-function test()
-	local prdel = "{\\fs32 \\fad(200,200)} kokot, +ě2š2, degen \\n"
-	aegisub.debug.out("Origo: \n" .. prdel .. "\nEdit:\n" .. prdel:gsub("{[^}]+}", ""))
-end
-
 aegisub.register_macro("GS Toolkit/Korektura/Zápis změny", "Zapíše úpravu řádku do výpisu", korektorLog)
 aegisub.register_macro("GS Toolkit/Korektura/Otevřít výpis změn", "Otevře výpis změn", korektorLogOpen)
 aegisub.register_macro("GS Toolkit/Korektura/Smazat dnešní výpis změn", "Odstraní dnešní výpis změn", smazatKor)
@@ -713,4 +708,3 @@ aegisub.register_macro("GS Toolkit/Nastavení", "Otevře okno nastavení", toolk
 aegisub.register_macro("GS Toolkit/Otevřít pracovní složku", "Otevře pracovní složku", gsfolderOpen)
 aegisub.register_macro("GS Toolkit/Je všechno OK?", "Zkontroluje přítomnost souborů", selfTest)
 aegisub.register_macro("GS Toolkit/Smazat konfigurační soubor", "Odstraní konfigurační soubor", smazatConfig)
-aegisub.register_macro("test", "test", test)
