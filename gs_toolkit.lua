@@ -7,9 +7,10 @@
 script_name = "GS Toolkit"
 script_description = "Užitečná sada nástrojů pro líné překladatele a korektory ^_^"
 script_author = "KDan"
-script_version = "1.1"
+script_version = "2"
 
 include("karaskel.lua")
+include("unicode.lua")
 
 sep = package.config:sub(1,1)
 
@@ -31,6 +32,7 @@ else
 end
 
 mkvtoolnix_path = "C:\\Program Files\\MKVToolNix"
+transSeparator = ";"
 
 function smazatConfig()
 	os.remove(gs_folder_path .. sep .. "GS_Toolkit.cfg")
@@ -71,7 +73,9 @@ function zapsatConfig()
 	io.write("prekladatel=" .. prekladatelValue:gsub("\n", " "), "\n")
 	io.write("korektor=" .. korektorValue:gsub("\n", " "), "\n")
 	io.write("casovac=" .. casovacValue:gsub("\n", " "), "\n")
-	io.write("release=" .. releaseValue:gsub("\n", " "))
+	io.write("release=" .. releaseValue:gsub("\n", " "), "\n")
+	io.write("[transkripce]", "\n")
+	io.write("separator=" .. tostring(transSeparator))
 	io.close(config_soubor)
 end
 
@@ -99,7 +103,9 @@ function cistConfig()
 		io.write("prekladatel=", "\n")
 		io.write("korektor=", "\n")
 		io.write("casovac=", "\n")
-		io.write("release=")
+		io.write("release=", "\n")
+		io.write("[transkripce]", "\n")
+		io.write("separator=" .. tostring(transSeparator))
 		io.close(config_soubor)
 		config_soubor = io.open(gs_folder_path .. sep .. "GS_Toolkit.cfg", "r")
 	end
@@ -113,6 +119,8 @@ function cistConfig()
 	configPodpisKorektor=io.read("*line")
 	configPodpisCasovac=io.read("*line")
 	configPodpisRelease=io.read("*line")
+	configIndex=io.read("*line")
+	configTransSeparator=io.read("*line")
 	io.close(config_soubor)
 	
 	--zápis přečtených hodnot pro proměnných dialogových oken
@@ -122,6 +130,7 @@ function cistConfig()
 	korektorValue = configPodpisKorektor:gsub("korektor=", "")
 	casovacValue = configPodpisCasovac:gsub("casovac=", "")
 	releaseValue = configPodpisRelease:gsub("release=", "")
+	transSeparator = configTransSeparator:gsub("separator=", "")
 	
 	--definice dialogových oken
 
@@ -152,6 +161,16 @@ function cistConfig()
 			class="textbox",name="path_mkv",
 			x=0,y=5,width=15,height=1,
 			value=mkvtoolnix_path
+		},
+		{
+			class="label",
+			x=0,y=7,width=1,height=1,
+			label="Transkripční separátor:"
+		},
+		{
+			class="textbox",name="separator",
+			x=1,y=7,width=5,height=1,
+			value=transSeparator
 		}
 	}
 	
@@ -538,6 +557,7 @@ function toolkitSetup()
 	setButtons, setResults = aegisub.dialog.display(dialogNastaveni_config, dialogNastaveni_buttons)
 	if setButtons=="Ulozit" then
 		mkvtoolnix_path = setResults["path_mkv"]
+		transSeparator = setResults["separator"]
 		zapsatConfig()
 	end
 end
@@ -697,6 +717,83 @@ function mamWidle()
 	return widle
 end
 
+
+function transPrep(subs, sel)
+	local radek = subs[sel[1]]
+	local prdel = radek.text;
+    local jakozeregex = "(%S+"..transSeparator.."%S+)"
+    local transPary = {}
+    for par in string.gmatch(prdel, jakozeregex) do
+       table.insert(transPary, par)
+    end 
+	if (transPary[1]~=nil) then
+		local transka = 2
+		local vystup = prdel;
+		for parek in ipairs(transPary) do
+			vystup = vystup:gsub(jakozeregex, '{\\trans("'..dosplitu(transPary[parek])[1]..'", "'..dosplitu(transPary[parek])[2]..'")}',1)
+		end
+		radek.text = vystup
+		subs[sel[1]] = radek
+	end
+end
+function dosplitu (inputstr)
+        local t={}
+        for str in string.gmatch(inputstr, "([^"..transSeparator.."]+)") do
+                table.insert(t, str)
+        end
+        return t
+end
+
+function transExportCZ(subs)
+	transka = 2
+	local jakozeregex = '{\\trans%("(.-)"%s*,%s*"(.-)"%)}'
+	for i=1, subs.n do
+		if (subs[i].class == "dialogue") then
+			local radek = subs[i]
+			local prdel = radek.text;
+			local transPary = {}
+			for slovo1, slovo2 in string.gmatch(prdel, jakozeregex) do
+			   table.insert(transPary, slovo1 .. transSeparator .. slovo2)
+			end 
+			if (transPary[1]~=nil) then
+				local parek = 1
+				local vystup = prdel;
+				for par in ipairs(transPary) do
+					vystup = vystup:gsub(jakozeregex, dosplitu(transPary[par])[transka],1)
+				end
+				radek.text = vystup
+				subs[i] = radek
+			end
+		end
+	end
+end
+
+function transExportEN(subs)
+	transka = 1
+	local jakozeregex = '{\\trans%("(.-)"%s*,%s*"(.-)"%)}'
+	for i=1, subs.n do
+		if (subs[i].class == "dialogue") then
+			local radek = subs[i]
+			local prdel = radek.text;
+			local transPary = {}
+			for slovo1, slovo2 in string.gmatch(prdel, jakozeregex) do
+			   table.insert(transPary, slovo1 .. transSeparator .. slovo2)
+			end 
+			if (transPary[1]~=nil) then
+				local parek = 1
+				local vystup = prdel;
+				for par in ipairs(transPary) do
+					vystup = vystup:gsub(jakozeregex, dosplitu(transPary[par])[transka],1)
+				end
+				radek.text = vystup
+				subs[i] = radek
+			end
+		end
+	end
+end
+
+cistConfig()
+
 aegisub.register_macro("GS Toolkit/Korektura/Zápis změny", "Zapíše úpravu řádku do výpisu", korektorLog)
 aegisub.register_macro("GS Toolkit/Korektura/Otevřít výpis změn", "Otevře výpis změn", korektorLogOpen)
 aegisub.register_macro("GS Toolkit/Korektura/Smazat dnešní výpis změn", "Odstraní dnešní výpis změn", smazatKor)
@@ -708,3 +805,6 @@ aegisub.register_macro("GS Toolkit/Nastavení", "Otevře okno nastavení", toolk
 aegisub.register_macro("GS Toolkit/Otevřít pracovní složku", "Otevře pracovní složku", gsfolderOpen)
 aegisub.register_macro("GS Toolkit/Je všechno OK?", "Zkontroluje přítomnost souborů", selfTest)
 aegisub.register_macro("GS Toolkit/Smazat konfigurační soubor", "Odstraní konfigurační soubor", smazatConfig)
+aegisub.register_macro("GS Toolkit/Převést na \\trans tag", "Příprava k exportu", transPrep)
+aegisub.register_filter("GS Toolkit - Česká transkripce", "Export titulků s českou transkou.", 2000, transExportCZ)
+aegisub.register_filter("GS Toolkit - Anglická transkripce", "Export titulků s anglickou transkou.", 2000, transExportEN)
